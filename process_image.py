@@ -9,8 +9,6 @@ from PIL import Image
 import torch.nn.functional as F
 from efficientnet_pytorch import EfficientNet
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
-
-# 關閉Waring輸出
 sys.stdout = open(os.devnull, 'w')
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -81,7 +79,7 @@ def load_model(model_name:str):
 model = load_model("mobilenet")
 
 transform = transforms.Compose([
-    transforms.Resize((224, 224)),
+    transforms.Resize((350, 350)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
 ])
