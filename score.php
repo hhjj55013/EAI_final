@@ -14,15 +14,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadFile)) {
         $imagePath = $uploadFile; // 保存圖片路徑以便顯示
         $returnCode = 0;
+        $resultMessage = "載入中";
+
+        // 記錄開始時間
+        $startTime = microtime(true);
+
         $command = escapeshellcmd("python3 process_image.py " . escapeshellarg($uploadFile));
         exec($command, $output, $returnCode);
 
+        // 記錄結束時間
+        $endTime = microtime(true);
+
+        // 計算執行時間
+        $executionTime = $endTime - $startTime;
         if ($returnCode === 0) {
             $score = floatval($output[0]);
-            $resultMessage = "圖片分析分數: " . number_format($score, 2);
+            $resultMessage = "圖片分析分數: " . number_format($score, 2) .
+                            "（執行時間: " . number_format($executionTime, 4) . " 秒）";
             $resultClass = "success";
-        } else {
+        } else{
             $resultMessage = "處理圖片時發生錯誤，請稍後再試。";
+            var_dump($output);
             $resultClass = "error";
         }
     } else {
@@ -91,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-family: 'Poppins', sans-serif;
             font-weight: 500;
             font-size: 1rem;
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
@@ -182,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             <?php endif; ?>
         </div>
         <div id="result" class="<?= isset($resultClass) ? $resultClass : '' ?>">
-            <?= isset($resultMessage) ? htmlspecialchars($resultMessage) : '載入中...' ?>
+            <?= isset($resultMessage) ? htmlspecialchars($resultMessage) : '' ?>
         </div>
     </div>
     <script>
