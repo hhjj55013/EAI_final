@@ -1,0 +1,46 @@
+<?php
+// 檢查是否有文件上傳
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
+    $uploadDir = 'uploads/';
+    $uploadFile = $uploadDir . basename($_FILES['image']['name']);
+
+    // 確保上傳目錄存在
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
+    // 將圖片移動到伺服器的上傳目錄
+    if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadFile)) {
+        // 呼叫 Python 程式處理圖片
+        $output = [];
+        $returnCode = 0;
+        $command = escapeshellcmd("python3 process_image.py " . escapeshellarg($uploadFile));
+        exec($command, $output, $returnCode);
+
+        if ($returnCode === 0) {
+            // Python 程式返回的分數
+            $score = floatval($output[0]);
+            echo "<h1>圖片分析分數: " . number_format($score, 2) . "</h1>";
+        } else {
+            echo "<h1>處理圖片時發生錯誤</h1>";
+        }
+    } else {
+        echo "<h1>圖片上傳失敗</h1>";
+    }
+}
+?>
+
+<!-- HTML 表單 -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>圖片分析</title>
+</head>
+<body>
+    <h1>上傳圖片進行分析</h1>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">上傳並分析</button>
+    </form>
+</body>
+</html>
