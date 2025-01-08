@@ -137,6 +137,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             max-height: 100%;
         }
 
+        #loading{
+            display: none;
+            margin-top: 1rem;
+            color: #007bff;
+            font-weight: bold;
+        }
+
         #result {
             margin-top: 1rem;
             font-size: 1.1rem;
@@ -175,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             <?php endif; ?>
         </div>
         <div id="result" class="<?= isset($resultClass) ? $resultClass : '' ?>">
-            <?= isset($resultMessage) ? htmlspecialchars($resultMessage) : '' ?>
+            <?= isset($resultMessage) ? htmlspecialchars($resultMessage) : '載入中...' ?>
         </div>
     </div>
     <script>
